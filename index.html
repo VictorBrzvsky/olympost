@@ -63,6 +63,11 @@ h3{font-family:var(--f-body);font-weight:600;font-size:19px;line-height:1.3}
 .nav{display:flex;align-items:center;gap:26px;font-size:15px;font-weight:500}
 .nav a:not(.btn){text-decoration:none;color:var(--ink-2)}
 .nav a:not(.btn):hover{color:var(--ink)}
+.lang-switch{display:inline-flex;border:1.5px solid var(--line);background:transparent;padding:0;cursor:pointer;font:600 13px/1 var(--f-mono);letter-spacing:.04em;color:var(--muted)}
+.lang-switch span{padding:9px 10px;transition:background .15s,color .15s}
+.lang-switch span.on{background:var(--ink);color:var(--bg)}
+.lang-switch:hover{border-color:var(--ink-2)}
+.lang-switch:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 @media (max-width:1040px){.nav a:not(.btn){display:none}}
 @media (max-width:560px){.nav .btn{display:none}}
 
@@ -373,6 +378,7 @@ footer{border-top:1px solid var(--line);padding-block:28px}
       <a href="#accounts">Защита</a>
       <a href="#price">Цена</a>
       <a href="#faq">Вопросы</a>
+      <button class="lang-switch" id="langSwitch" type="button" aria-label="Язык / Language"><span data-l="ru">RU</span><span data-l="en">EN</span></button>
       <a class="btn btn-primary btn-sm" href="#book">Тестовый доступ</a>
     </nav>
   </div>
@@ -722,6 +728,315 @@ function pad(n){ return String(n).padStart(2,'0'); }
 function mmss(s){ s=Math.max(0,Math.round(s)); return Math.floor(s/60)+':'+pad(s%60); }
 function hm(off){ var d=new Date(Date.now()+(off||0)*60000); return pad(d.getHours())+':'+pad(d.getMinutes()); }
 
+/* ---------- Язык RU / EN ---------- */
+var LANG='ru';
+var langHooks=[];
+var EN={
+'Olympost — платформа, которая генерирует и публикует контент':'Olympost: a platform that generates and publishes content',
+'Olympost создаёт цифрового персонажа вашего бренда и ведёт соцсети: вирусные форматы, сценарии, ультрареалистичные видео, публикация. Протестируйте лично.':'Olympost creates a digital character for your brand and runs your social media: viral formats, scripts, ultra-realistic videos, publishing. Try it yourself.',
+'Olympost, на главную':'Olympost, back to top',
+'Разделы':'Sections',
+'Язык / Language':'Язык / Language',
+'Демо':'Demo','Форматы':'Formats','Защита':'Protection','Цена':'Pricing','Вопросы':'FAQ',
+'Тестовый доступ':'Test access',
+'AI-платформа контента для бизнеса и личных брендов':'AI content platform for businesses and personal brands',
+'Контент генерируется, монтируется и публикуется':'Content is generated, edited and published',
+'без вас':'without you',
+'Olympost — платформа, которая создаёт цифрового персонажа вашего бренда, находит вирусные форматы, пишет сценарии, генерирует ультрареалистичные видео и сама их публикует. Содержание аккаунтов тоже на нас — вам остаётся смотреть на результат.':'Olympost is a platform that creates a digital character for your brand, finds viral formats, writes scripts, generates ultra-realistic videos and publishes them on its own. We also take care of running the accounts, so all you do is watch the results.',
+'Получить тестовый доступ':'Get test access',
+'Смотреть, как это работает':'See how it works',
+'Создайте пару видео сами и посмотрите, как это работает — до любой оплаты.':'Create a couple of videos yourself and see how it works, before any payment.',
+'Демонстрация выпуска контента':'Content production demo',
+'Выпуск контента':'Content production',
+'демо · 12 аккаунтов':'demo · 12 accounts',
+'опубликовано сегодня':'published today',
+'в работе сейчас':'in progress now',
+'на прогреве':'warming up',
+'4 мин':'4 min','30 сек':'30 sec',
+'генерация ролика на собственных серверах':'to generate a video on our own servers',
+'публикация в аккаунт':'to publish to an account',
+'внешних API в генерации: всё на своих серверах':'external APIs in generation: everything runs on our servers',
+'15-секундный ролик с голосом и липсинком':'for a 15-second video with voice and lip-sync',
+'Как это работает':'How it works',
+'От вас нужен один бриф. Остальное делает платформа':'All we need from you is one brief. The platform does the rest',
+'Один раз рассказываете о бренде, дальше Olympost сам ведёт ресерч, производство и публикацию на всех аккаунтах.':'Tell us about your brand once, and Olympost handles research, production and publishing across all accounts.',
+'Шаг 1':'Step 1','Шаг 2':'Step 2','Шаг 3':'Step 3',
+'Бриф о бренде':'Brand brief',
+'Загружаете фото или видео, образец голоса, описание продукта, гео, языки и стоп-слова. Это единственное, что нужно от вас.':'You upload photos or video, a voice sample, a product description, geo, languages and stop-words. That is the only thing we need from you.',
+'Фото и видео':'Photo and video','Голос':'Voice','Продукт':'Product','Гео и языки':'Geo and languages','Стоп-слова':'Stop-words',
+'Персонаж и аккаунты':'Character and accounts',
+'Собираем AI-персонажа вашего бренда, оформляем профили и подключаем аккаунты. Дальше платформа сама ведёт их как живых пользователей.':'We build an AI character for your brand, set up the profiles and connect the accounts. From then on the platform runs them like real users.',
+'AI-персонаж':'AI character','Профили':'Profiles','Аккаунты':'Accounts','Поведение человека':'Human behavior',
+'Автопилот':'Autopilot',
+'Платформа ищет вирусные форматы, пишет сценарии, генерирует и публикует ролики. Вы выбираете: одобрять каждый ролик или включить полный автопостинг.':'The platform finds viral formats, writes scripts, generates and publishes videos. You choose: approve every video or switch on full auto-posting.',
+'Ресерч':'Research','Сценарии':'Scripts','Генерация':'Generation','Публикация':'Publishing',
+'Посмотрите, как работает Olympost':'See how Olympost works',
+'Запись экрана платформы: от выбора формата и подготовки сценария до генерации, монтажа и публикации ролика.':'A screen recording of the platform: from choosing a format and preparing a script to generating, editing and publishing a video.',
+'Запись экрана платформы Olympost':'Olympost platform screen recording',
+'OLYMPOST / ЗАПИСЬ ЭКРАНА':'OLYMPOST / SCREEN RECORDING',
+'Olympost в работе':'Olympost in action',
+'Запись экрана скоро появится':'Screen recording coming soon',
+'Попробуйте платформу со своим продуктом.':'Try the platform with your own product.',
+'Получите тестовый доступ и создайте пару видео сами.':'Get test access and create a couple of videos yourself.',
+'Вирусные форматы':'Viral formats',
+'Берём форматы, которые уже стали вирусными, и пересобираем под ваш бренд':'We take formats that have already gone viral and rebuild them for your brand',
+'Платформа разбирает чужие ролики до мимики и интонации, анализирует конкурентов и переносит рабочую структуру на вашего персонажа, продукт и язык.':'The platform breaks down other videos down to facial expressions and intonation, analyzes competitors and carries the working structure over to your character, product and language.',
+'Повторяем и переосмысляем вирусные видео':'We repeat and reinterpret viral videos',
+'Раскладываем формат на части: хук, мимика, подача, темп монтажа':'We break a format into parts: hook, expressions, delivery, editing pace',
+'Анализируем конкурентов в вашей нише и гео':'We analyze competitors in your niche and geo',
+'Адаптируем под продукт, язык и стоп-слова бренда':'We adapt it to the product, language and stop-words of your brand',
+'Разбор вирусного ролика · 0:27':'Viral video breakdown · 0:27',
+'пример':'example',
+'Части ролика':'Video parts',
+'В оригинале':'In the original',
+'Для вашего бренда':'For your brand',
+'Защита аккаунтов':'Account protection',
+'Аккаунты живут как аккаунты обычных людей, а ИИ следит, чтобы так и оставалось':'Accounts live like ordinary people’s accounts, and AI makes sure it stays that way',
+'Содержание и ведение аккаунтов полностью на нас. Платформа не похожа на автоматизацию, поэтому у соцсети нет повода ограничивать аккаунт.':'We handle running the accounts entirely. The platform does not look like automation, so the social network has no reason to restrict an account.',
+'01 · Профиль':'01 · Profile','02 · Подключение':'02 · Connection','03 · Прогрев':'03 · Warm-up','04 · Ведение':'04 · Management',
+'Оформление':'Setup',
+'Аватар, имя, био и визуал под персонажа и нишу.':'Avatar, name, bio and visuals matched to the character and niche.',
+'Аккаунт в системе':'Account in the system',
+'Аккаунт подключается к платформе и работает в закреплённой среде, без скачков и смены окружения.':'The account connects to the platform and runs in a fixed environment, with no jumps or changes of surroundings.',
+'Аккаунт листает ленту, смотрит Reels, ставит лайки и подписывается, как новый пользователь.':'The account scrolls the feed, watches Reels, likes and follows, like a new user.',
+'Ежедневный постинг':'Daily posting',
+'Публикации по расписанию, 3–4 ролика в день, контроль состояния каждого аккаунта.':'Scheduled posts, 3–4 videos a day, and monitoring of every account’s health.',
+'Самообучающийся ИИ':'Self-learning AI',
+'Антибан-система':'Anti-ban system',
+'Встроенный ИИ разбирает причину каждого бана и на лету корректирует поведение остальных аккаунтов. Одна и та же ошибка не повторяется.':'The built-in AI analyzes the cause of every ban and adjusts the behavior of the other accounts on the fly. The same mistake is never repeated.',
+'Имитация на каждом этапе':'Imitation at every stage',
+'Человеческое поведение':'Human behavior',
+'Паузы, прокрутка, просмотры и время в приложении при прогреве и при публикации.':'Pauses, scrolling, views and time in the app during warm-up and publishing.',
+'Без автопостеров':'No auto-posters',
+'Публикация как у обычного пользователя':'Publishing like an ordinary user',
+'Мы не используем системы автопостинга и официальные API, из-за которых аккаунты попадают под ограничения.':'We do not use auto-posting systems or official APIs, which are what get accounts restricted.',
+'Менеджмент на нас':'Management is on us',
+'Вы только смотрите на результат':'You just watch the results',
+'Содержим аккаунты, следим за их состоянием и отвечаем за стабильный выпуск роликов.':'We maintain the accounts, monitor their health and are responsible for a steady output of videos.',
+'Мы снижаем технический риск бана, но не отменяем правила соцсетей: контент, который сам их нарушает, ограничат при любой платформе.':'We reduce the technical risk of a ban, but we do not override the rules of social networks: content that breaks them will be restricted on any platform.',
+'Почему Olympost':'Why Olympost',
+'Своё ядро вместо чужих API':'Our own core instead of other people’s APIs',
+'Генерация и публикация работают на нашей технологии. Отсюда низкая цена ролика и поток, который не зависит от внешних сервисов.':'Generation and publishing run on our own technology. That is why a video costs so little and the output does not depend on external services.',
+'Персонаж':'Character',
+'Цифровой персонаж вашего бренда':'A digital character for your brand',
+'Голос, внешность, языки, гео и стиль бренда. Один персонаж ведёт несколько ниш и форматов: говорящая голова, трейдинг-разборы и другие.':'Voice, appearance, languages, geo and brand style. One character can run several niches and formats: talking head, trading breakdowns and more.',
+'Качество':'Quality',
+'Ультрареалистичное видео':'Ultra-realistic video',
+'Мимика, голос и подача на уровне живой съёмки.':'Facial expressions, voice and delivery at the level of live filming.',
+'Себестоимость':'Cost',
+'Свои модели на своих серверах':'Our own models on our own servers',
+'Фото, голос и липсинк генерируем open-source моделями. 15-секундный ролик стоит $0.25, а минута видео в платных AI-генераторах выходит в разы дороже.':'We generate photo, voice and lip-sync with open-source models. A 15-second video costs $0.25, while a minute of video in paid AI generators costs several times more.',
+'Надёжность':'Reliability',
+'Поток роликов не зависит от провайдеров':'The video output does not depend on providers',
+'Всё хостится у нас. Чужие лимиты, повышение цен и отключения провайдеров на выпуск роликов не влияют.':'Everything is hosted by us. Other people’s limits, price hikes and provider outages do not affect video output.',
+'Масштаб':'Scale',
+'Без лимита на аккаунты':'No limit on accounts',
+'Нет ограничений на число аккаунтов и роликов, а масштабирование остаётся дешёвым. Предел задаёт только ваш бюджет.':'There is no limit on the number of accounts or videos, and scaling stays cheap. Only your budget sets the limit.',
+'Владение':'Ownership',
+'Лицензия, а не аренда':'A license, not a rental',
+'Вы покупаете лицензию с обучением, промптами и поддержкой. Настроенный персонаж остаётся у вас и после окончания года.':'You buy a license with training, prompts and support. The character you set up stays with you after the year ends.',
+'Сравнение':'Comparison',
+'Чем Olympost отличается от генераторов и автопостеров':'How Olympost differs from generators and auto-posters',
+'AI-генераторы видео (Arcads, HeyGen)':'AI video generators (Arcads, HeyGen)',
+'Автопостинг через официальный API':'Auto-posting via the official API',
+'Своя команда':'In-house team',
+'Ресерч, идеи, сценарии':'Research, ideas, scripts',
+'Сам: разбирает вирусные форматы и конкурентов':'Automatic: analyzes viral formats and competitors',
+'Сценарий пишете вы':'You write the script',
+'Нет':'No',
+'Ресерчер и сценарист':'A researcher and a scriptwriter',
+'Генерация видео':'Video generation',
+'Свои open-source модели на своих серверах':'Our own open-source models on our own servers',
+'Да, по кредитам':'Yes, by credits',
+'Съёмка и монтаж вручную':'Manual filming and editing',
+'Цена видео':'Video price',
+'$0.25 за 15 сек, $0.51 за 30 сек':'$0.25 per 15 sec, $0.51 per 30 sec',
+'Около $6–11 за минуту видео в Arcads, в зависимости от плана':'About $6–11 per minute of video in Arcads, depending on the plan',
+'Видео нужно делать отдельно':'Videos have to be made separately',
+'От $120 000 в год на направление':'From $120,000 a year per direction',
+'Ведение аккаунтов':'Account management',
+'Берём на себя: оформление, прогрев, ежедневный постинг, контроль состояния':'We take it on: setup, warm-up, daily posting, health monitoring',
+'Вручную':'Manually',
+'Защита аккаунтов':'Account protection',
+'Самообучающийся антибан ИИ и поведение живого пользователя':'Self-learning anti-ban AI and the behavior of a real user',
+'Не их задача':'Not their job',
+'Лимиты API и риск ограничений за массовый паттерн':'API limits and the risk of restrictions for a mass pattern',
+'На вас':'On you',
+'Как обычный пользователь, без автопостеров':'Like an ordinary user, no auto-posters',
+'Да, с лимитами API':'Yes, with API limits',
+'Зависимость':'Dependency',
+'Всё на своих серверах':'Everything on our own servers',
+'От тарифов и мощностей сервиса':'On the service’s plans and capacity',
+'От правил и лимитов API':'On API rules and limits',
+'От людей и найма':'On people and hiring',
+'Без лимита на аккаунты, ограничен только бюджетом':'No limit on accounts, limited only by budget',
+'Кредиты и тарифы':'Credits and plans',
+'Лимиты публикаций':'Posting limits',
+'Новые сотрудники':'New hires',
+'Цены Arcads по обзорам тарифов 2026 года:':'Arcads prices according to 2026 plan reviews:',
+'. Arcads не публикует цены открыто, тарифы и акции меняются. Стоимость команды: консервативная оценка по фриланс-рынку США, 2026.':'. Arcads does not publish prices openly, and plans and promotions change. Team cost: a conservative estimate based on the US freelance market, 2026.',
+'Стоимость':'Pricing',
+'Лицензия Olympost':'Olympost license',
+'Лицензия Olympost стоит $15 000 в год и включает платформу, настройку персонажа, обучение и поддержку. Инфраструктура оплачивается отдельно, по себестоимости.':'The Olympost license costs $15,000 a year and includes the platform, character setup, training and support. Infrastructure is paid separately, at cost.',
+'за год':'per year',
+'Полный цикл производства: от ресерча и идеи до готового ролика и публикации':'The full production cycle: from research and an idea to a finished video and publishing',
+'Цифровой персонаж под ваш бренд: внешность, голос, язык и стиль подачи':'A digital character for your brand: appearance, voice, language and delivery style',
+'Настройки по вашему брифу: продукт, ниша, география, языки и стоп-слова':'Settings from your brief: product, niche, geography, languages and stop-words',
+'Анализ конкурентов и вирусных форматов с адаптацией под ваш продукт':'Analysis of competitors and viral formats, adapted to your product',
+'Сценарии, генерация видео, монтаж, субтитры, описания и хэштеги':'Scripts, video generation, editing, subtitles, descriptions and hashtags',
+'Выбор режима работы: согласование роликов перед публикацией или автопостинг':'Choice of mode: approve videos before publishing, or auto-posting',
+'Оформление, подключение, прогрев и автоматическое ведение аккаунтов':'Setup, connection, warm-up and automatic management of accounts',
+'Обучение работе с платформой и готовые промпты для запуска':'Training on the platform and ready-made prompts to get started',
+'Поддержка команды и все обновления платформы в течение года':'Team support and all platform updates for the year',
+'Сохранение вашего персонажа и настроек после окончания года':'Your character and settings are kept after the year ends',
+'Через год персонаж и настройки остаются у вас. Отключаются только обновления и поддержка команды.':'After a year the character and settings stay with you. Only updates and team support are switched off.',
+'Расходники':'Running costs',
+'Расходы на ваш объём':'Costs for your volume',
+'Аккаунты и производство видео по себестоимости. Лицензия оплачивается отдельно.':'Accounts and video production at cost. The license is paid separately.',
+'Калькулятор расходов':'Cost calculator',
+'Instagram-аккаунты':'Instagram accounts',
+'Точное количество Instagram-аккаунтов':'Exact number of Instagram accounts',
+'Видео в месяц':'Videos per month',
+'Ролики по 15 секунд':'15-second videos',
+'Точное количество видео в месяц':'Exact number of videos per month',
+'В месяц':'Per month',
+'За первый год':'First year',
+'Месячная сумма — регулярные расходы. В первый год также включён запуск аккаунтов.':'The monthly amount is the recurring cost. The first year also includes launching the accounts.',
+'Устройства и сервер подбираем под ваш объём и оплачиваем отдельно по себестоимости.':'We select devices and a server for your volume and charge for them separately, at cost.',
+'Гарантии':'Guarantees',
+'Проверьте платформу до оплаты':'Check the platform before you pay',
+'$15 000 — сумма, где не работают обещания на словах. Поэтому решение можно проверить, а не просто поверить.':'$15,000 is an amount where verbal promises do not work. So you can verify the solution instead of just taking our word for it.',
+'Тест':'Test',
+'Увидите, а не поверите на слово':'See it instead of taking our word',
+'Тестовый доступ без панели администратора: вы сами создаёте пару видео под свой продукт ещё до решения.':'Test access without the admin panel: you create a couple of videos for your product yourself, before you decide.',
+'Возврат':'Refund',
+'Деньги не уходят в никуда':'Your money does not vanish',
+'Не устроило качество или платформа подвела — возвращаем деньги по вашему запросу, если вы не готовы ждать исправлений.':'If the quality is not good enough or the platform lets you down, we refund your money on request if you are not willing to wait for fixes.',
+'Протестируйте платформу лично':'Test the platform yourself',
+'Оставьте контакты — выдадим тестовый доступ без панели администратора. Вы сами создадите пару видео и увидите, как это работает.':'Leave your contacts and we will give you test access without the admin panel. You will create a couple of videos yourself and see how it works.',
+'Выдаём доступ':'We give you access',
+'Без панели администратора: только создание роликов.':'No admin panel: video creation only.',
+'Создаёте пару видео сами':'You create a couple of videos yourself',
+'Под свой продукт, на своём языке и с вашим персонажем.':'For your product, in your language and with your character.',
+'Смотрим результат вместе':'We review the result together',
+'Разбираем, что получилось и подходит ли это под ваш продукт.':'We go through what came out and whether it suits your product.',
+'Считаем объём и план запуска':'We calculate volume and the launch plan',
+'Инфраструктура под ваш масштаб, сроки и первые шаги.':'Infrastructure for your scale, timing and first steps.',
+'Имя':'Name',
+'Как к вам обращаться':'How should we address you',
+'Компания или ниша':'Company or niche',
+'Например, онлайн-школа':'For example, an online school',
+'Телефон':'Phone',
+'(необязательно)':'(optional)',
+'+7 900 000-00-00':'+1 555 000-0000',
+'Сколько аккаунтов планируете':'How many accounts do you plan',
+'Больше 50':'More than 50',
+'Достаточно одного контакта: телефона или Telegram.':'One contact is enough: a phone number or Telegram.',
+'Отправляя заявку, вы соглашаетесь, что мы свяжемся с вами по указанным контактам.':'By submitting the request you agree that we will contact you using the details provided.',
+'Заявка принята':'Request received',
+'Изменить данные':'Edit details',
+'Частые вопросы':'Frequently asked questions',
+'Не нашли ответ? Задайте вопрос, когда получите тестовый доступ.':'Did not find an answer? Ask your question once you have test access.',
+'Нужно ли нам что-то снимать?':'Do we need to film anything?',
+'Нет. Один раз вы передаёте фото или видео, образец голоса, описание продукта, гео, языки и стоп-слова. Дальше персонаж и ролики создаются на платформе.':'No. You hand over photos or video, a voice sample, a product description, geo, languages and stop-words once. After that the character and videos are created on the platform.',
+'Как протестировать до покупки?':'How can we test before buying?',
+'Оставьте заявку, и мы выдадим тестовый доступ без панели администратора. Вы сами создаёте пару видео под свой продукт и смотрите качество до оплаты.':'Submit a request and we will give you test access without the admin panel. You create a couple of videos for your product yourself and check the quality before paying.',
+'Что если результат не понравится?':'What if we do not like the result?',
+'Если качество слабое или платформа подвела, возвращаем деньги по вашему запросу, когда вы не готовы ждать исправлений.':'If the quality is weak or the platform lets you down, we refund your money on request when you are not willing to wait for fixes.',
+'Можно проверять ролики перед публикацией?':'Can we review videos before they are published?',
+'Да. Можно одобрять каждый ролик вручную или включить полный автопостинг. Режим меняется в любой момент.':'Yes. You can approve every video manually or switch on full auto-posting. The mode can be changed at any time.',
+'Сколько роликов в день можно публиковать?':'How many videos a day can be published?',
+'Технически до 20 на аккаунт. Для здоровья аккаунта рекомендуем 3–4, а объём наращивать числом аккаунтов: лимита на них нет.':'Technically up to 20 per account. For the health of the account we recommend 3–4, and growing volume by adding accounts: there is no limit on them.',
+'Что с риском блокировок?':'What about the risk of bans?',
+'На платформе работает самообучающийся ИИ: он разбирает причину каждого бана и на лету корректирует поведение остальных аккаунтов, чтобы та же ошибка не повторилась. Аккаунты ведут себя как обычные пользователи на всех этапах, а автопостеры и официальные API мы не используем. Но если контент сам нарушает правила площадки, ограничения возможны при любой платформе: мы снижаем технический риск, а не отменяем правила соцсетей.':'A self-learning AI runs on the platform: it analyzes the cause of every ban and adjusts the behavior of the other accounts on the fly so the same mistake does not happen again. Accounts behave like ordinary users at every stage, and we do not use auto-posters or official APIs. But if the content itself breaks a platform’s rules, restrictions are possible on any platform: we reduce the technical risk, we do not override the rules of social networks.',
+'Почему ролики дешевле, чем на платформах?':'Why are videos cheaper than on other platforms?',
+'Мы генерируем видео open-source моделями на собственных серверах и не платим внешним API и подпискам. 15-секундный ролик с голосом и липсинком стоит $0.25, 30-секундный $0.51.':'We generate video with open-source models on our own servers and do not pay for external APIs and subscriptions. A 15-second video with voice and lip-sync costs $0.25, a 30-second one $0.51.',
+'Что входит в $15 000 и что будет через год?':'What is included in $15,000 and what happens after a year?',
+'Полный цикл производства контента, персонаж под ваш бренд, настройки по брифу, анализ конкурентов, сценарии, генерация, монтаж, субтитры и публикация. Также входят оформление и ведение аккаунтов, выбор между согласованием и автопостингом, обучение, готовые промпты, поддержка и все обновления на год. Через год персонаж и настройки остаются у вас, отключаются обновления и поддержка.':'The full content production cycle, a character for your brand, settings from your brief, competitor analysis, scripts, generation, editing, subtitles and publishing. Also included are account setup and management, a choice between approval and auto-posting, training, ready-made prompts, support and all updates for the year. After a year the character and settings stay with you, while updates and support are switched off.',
+'Почему инфраструктура оплачивается отдельно?':'Why is infrastructure paid separately?',
+'Генерации, устройства, аккаунты, прокси и сервер зависят от вашего масштаба. Мы продаём их по себестоимости, без наценки. Расходы на выбранное количество аккаунтов и видео можно оценить в':'Generations, devices, accounts, proxies and the server depend on your scale. We sell them at cost, with no markup. You can estimate the costs for your chosen number of accounts and videos in the',
+'калькуляторе расходников':'running costs calculator',
+'. Остальную инфраструктуру обсудим при подготовке запуска.':'. We will discuss the rest of the infrastructure when preparing the launch.',
+'С какими соцсетями вы работаете?':'Which social networks do you work with?',
+'Основная площадка сейчас Instagram: от подключения аккаунта до ежедневного постинга. Про другие площадки расскажем при знакомстве с платформой.':'Our main platform right now is Instagram: from connecting an account to daily posting. We will tell you about other platforms when you get to know the platform.',
+'© 2026 Olympost. Платформа AI-контента для соцсетей.':'© 2026 Olympost. An AI content platform for social media.',
+/* демо-ферма */
+'Лея · недвижимость':'Leah · real estate','Марк · трейдинг':'Mark · trading','Ника · бьюти':'Nika · beauty','Анна · английский':'Anna · English',
+'Аккаунт':'Account',
+'Профиль':'Profile','Подключение':'Connecting','Прогрев':'Warm-up','Ждёт слот':'Waiting for slot','Монтаж':'Editing','Опубликовано':'Published',
+/* разбор ролика */
+'Хук':'Hook','Боль':'Pain point','Решение':'Solution','Доказательство':'Proof','Призыв':'Call to action',
+'Вопрос прямо в камеру, крупный план, брови вверх. Зритель решает, смотреть ли дальше, за первые две секунды.':'A question straight to camera, close-up, raised eyebrows. The viewer decides whether to keep watching within the first two seconds.',
+'Тот же приём с вопросом о вашем продукте, вашим персонажем и на языке вашей аудитории.':'The same move with a question about your product, by your character and in your audience’s language.',
+'мимика: удивление':'expression: surprise','крупный план':'close-up','вопрос в камеру':'question to camera',
+'Короткая пауза, интонация вниз, цифра крупным текстом в кадре.':'A short pause, a falling intonation, a number in large text on screen.',
+'Боль вашей аудитории из ресерча и цифра из вашей ниши.':'Your audience’s pain point from research and a number from your niche.',
+'пауза':'pause','текст в кадре':'on-screen text','интонация':'intonation',
+'Три пункта, смена плана каждые две секунды, жест рукой на каждом пункте.':'Three points, a shot change every two seconds, a hand gesture on each point.',
+'Три аргумента в пользу вашего продукта в том же ритме склеек.':'Three arguments for your product at the same cutting rhythm.',
+'склейка каждые 2 с':'a cut every 2 s','жесты':'gestures','список на экране':'list on screen',
+'Скриншот результата и спокойная уверенная подача.':'A screenshot of the result and a calm, confident delivery.',
+'Ваш кейс, отзыв или цифра в том же оформлении.':'Your case study, review or number in the same style.',
+'скриншот':'screenshot','спокойный темп':'calm pace',
+'«Сохрани, пригодится» и жест в сторону подписи.':'“Save this, it will come in handy” and a gesture toward the caption.',
+'Ваш призыв: подписка, сообщение в директ или ссылка в профиле.':'Your call to action: a subscription, a DM or a link in the profile.',
+'жест':'gesture',
+/* форма и сообщения */
+'Укажите имя.':'Please enter your name.',
+'Укажите телефон или Telegram, чтобы мы связались с вами.':'Please enter a phone number or Telegram so we can contact you.',
+'Проверьте номер телефона: нужно от 10 до 15 цифр, например +7 900 000-00-00.':'Check the phone number: it needs 10 to 15 digits, for example +1 555 000 0000.',
+'Проверьте Telegram: имя пользователя начинается с латинской буквы и содержит 5–32 буквы, цифры или подчёркивания.':'Check Telegram: the username starts with a Latin letter and contains 5–32 letters, digits or underscores.',
+'Отправка заявок пока недоступна. Попробуйте позже.':'Sending requests is not available yet. Please try again later.',
+'Отправляем…':'Sending…',
+'Не удалось отправить заявку. Данные сохранены в форме. Попробуйте ещё раз.':'Could not send the request. Your details are saved in the form. Please try again.'
+};
+function tr(s){ return (LANG==='en' && Object.prototype.hasOwnProperty.call(EN,s)) ? EN[s] : s; }
+var textOrig=new WeakMap(), attrOrig=new WeakMap();
+var metaDesc=document.querySelector('meta[name="description"]');
+var titleRu=document.title, descRu=metaDesc?metaDesc.getAttribute('content'):'';
+function translateTree(root){
+  var walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode:function(n){
+    return /^(SCRIPT|STYLE)$/.test(n.parentNode.nodeName)?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT;
+  }});
+  var n;
+  while((n=walker.nextNode())){
+    if(!textOrig.has(n)){
+      if(!/[А-Яа-яЁё]/.test(n.nodeValue)) continue;
+      textOrig.set(n,n.nodeValue);
+    }
+    var m=textOrig.get(n).match(/^(\s*)([\s\S]*?)(\s*)$/);
+    n.nodeValue=m[1]+tr(m[2])+m[3];
+  }
+  root.querySelectorAll('[aria-label],[placeholder],[title]').forEach(function(el){
+    var saved=attrOrig.get(el);
+    if(!saved){ saved={}; attrOrig.set(el,saved); }
+    ['aria-label','placeholder','title'].forEach(function(a){
+      if(!el.hasAttribute(a)) return;
+      if(!(a in saved)) saved[a]=el.getAttribute(a);
+      el.setAttribute(a,tr(saved[a]));
+    });
+  });
+}
+var langBtn=$('#langSwitch');
+function applyLang(){
+  document.documentElement.lang=LANG;
+  document.title=tr(titleRu);
+  if(metaDesc) metaDesc.setAttribute('content',tr(descRu));
+  translateTree(document.body);
+  langBtn.querySelectorAll('span').forEach(function(s){ s.classList.toggle('on', s.getAttribute('data-l')===LANG); });
+  langHooks.forEach(function(fn){ fn(); });
+}
+function initialLang(){
+  try{ var s=localStorage.getItem('olympost-lang'); if(s==='ru'||s==='en') return s; }catch(e){}
+  var nav=(navigator.languages&&navigator.languages[0])||navigator.language||'ru';
+  return /^(ru|uk|be|kk)/i.test(nav)?'ru':'en';
+}
+langBtn.addEventListener('click',function(){
+  LANG=LANG==='ru'?'en':'ru';
+  try{ localStorage.setItem('olympost-lang',LANG); }catch(e){}
+  applyLang();
+});
+
 /* ---------- Ферма устройств ---------- */
 var PERSONA=[
   {who:'Лея · недвижимость', g1:'#F0A35E', g2:'#5B3FA8'},
@@ -738,15 +1053,16 @@ var devs=SEED.map(function(x,i){
 });
 var LABEL={profile:'Профиль', reg:'Подключение', warm:'Прогрев', idle:'Ждёт слот', gen:'Генерация', edit:'Монтаж', post:'Публикация', done:'Опубликовано'};
 function subOf(d){
+  var en=LANG==='en';
   switch(d.s){
-    case 'profile': return 'аватар и био';
-    case 'reg': return 'новый аккаунт';
-    case 'warm': return 'день '+d.day;
-    case 'idle': return 'в '+d.slot;
-    case 'gen': return 'ещё '+mmss((1-d.p)*240);
-    case 'edit': return 'субтитры';
-    case 'post': return 'ещё '+mmss((1-d.p)*30);
-    case 'done': return 'в '+d.at;
+    case 'profile': return en?'avatar & bio':'аватар и био';
+    case 'reg': return en?'new account':'новый аккаунт';
+    case 'warm': return (en?'day ':'день ')+d.day;
+    case 'idle': return (en?'at ':'в ')+d.slot;
+    case 'gen': return en?mmss((1-d.p)*240)+' left':'ещё '+mmss((1-d.p)*240);
+    case 'edit': return en?'subtitles':'субтитры';
+    case 'post': return en?mmss((1-d.p)*30)+' left':'ещё '+mmss((1-d.p)*30);
+    case 'done': return (en?'at ':'в ')+d.at;
   }
   return '';
 }
@@ -762,10 +1078,9 @@ devs.forEach(function(d){
   el.className='dev';
   el.style.setProperty('--g1',d.per.g1);
   el.style.setProperty('--g2',d.per.g2);
-  el.innerHTML='<div class="dev-top"><span>Аккаунт '+pad(d.id)+'</span><span class="dev-notch"></span></div><div class="dev-screen"><span class="dev-st"></span><span class="dev-sub"></span></div><div class="dev-bar"><span></span></div><div class="dev-who"></div>';
-  el.querySelector('.dev-who').textContent=d.per.who;
+  el.innerHTML='<div class="dev-top"><span class="dev-acc"></span><span class="dev-notch"></span></div><div class="dev-screen"><span class="dev-st"></span><span class="dev-sub"></span></div><div class="dev-bar"><span></span></div><div class="dev-who"></div>';
   grid.appendChild(el);
-  tiles.push({el:el, st:el.querySelector('.dev-st'), sub:el.querySelector('.dev-sub'), bar:el.querySelector('.dev-bar span')});
+  tiles.push({el:el, acc:el.querySelector('.dev-acc'), who:el.querySelector('.dev-who'), st:el.querySelector('.dev-st'), sub:el.querySelector('.dev-sub'), bar:el.querySelector('.dev-bar span')});
 });
 var pubToday=23;
 function paintFarm(){
@@ -773,7 +1088,9 @@ function paintFarm(){
   devs.forEach(function(d,i){
     var t=tiles[i], cls='dev s-'+d.s;
     if(t.el.className!==cls) t.el.className=cls;
-    t.st.textContent=LABEL[d.s];
+    t.acc.textContent=tr('Аккаунт')+' '+pad(d.id);
+    t.who.textContent=tr(d.per.who);
+    t.st.textContent=tr(LABEL[d.s]);
     t.sub.textContent=subOf(d);
     t.bar.style.width=barOf(d)+'%';
     if(d.s==='gen'||d.s==='edit'||d.s==='post') work++;
@@ -796,6 +1113,7 @@ function stepDev(d){
   }
 }
 paintFarm();
+langHooks.push(paintFarm);
 if(!reduce){
   setInterval(function(){ if(document.hidden) return; devs.forEach(stepDev); paintFarm(); },800);
 }
@@ -828,7 +1146,8 @@ var videoUrl=vimeoEmbed(CONFIG.vimeoUrl);
 if(videoUrl){
   var player=document.createElement('iframe');
   player.src=videoUrl;
-  player.title='Запись экрана платформы Olympost';
+  player.title=tr('Запись экрана платформы Olympost');
+  langHooks.push(function(){ player.title=tr('Запись экрана платформы Olympost'); });
   player.loading='lazy';
   player.allow='fullscreen; picture-in-picture; encrypted-media';
   player.allowFullscreen=true;
@@ -845,20 +1164,27 @@ var SEG=[
   {n:'Доказательство',t:'0:20–0:25',w:5,o:'Скриншот результата и спокойная уверенная подача.',a:'Ваш кейс, отзыв или цифра в том же оформлении.',tags:['скриншот','спокойный темп']},
   {n:'Призыв',t:'0:25–0:27',w:2,o:'«Сохрани, пригодится» и жест в сторону подписи.',a:'Ваш призыв: подписка, сообщение в директ или ссылка в профиле.',tags:['CTA','жест']}
 ];
-var track=$('#decoTrack'), dchips=$('#decoChips'), segEls=[], chipEls=[];
+var track=$('#decoTrack'), dchips=$('#decoChips'), segEls=[], chipEls=[], segLabels=[], curSeg=0;
 function pickSeg(i){
-  var s=SEG[i];
+  var s=SEG[i]; curSeg=i;
   segEls.forEach(function(el,j){ el.classList.toggle('on', j===i); });
   chipEls.forEach(function(el,j){ el.setAttribute('aria-selected', String(j===i)); el.tabIndex= j===i ? 0 : -1; });
-  $('#ddName').textContent=s.n; $('#ddTime').textContent=s.t;
-  $('#ddOrig').textContent=s.o; $('#ddAdapt').textContent=s.a;
+  $('#ddName').textContent=tr(s.n); $('#ddTime').textContent=s.t;
+  $('#ddOrig').textContent=tr(s.o); $('#ddAdapt').textContent=tr(s.a);
   var tg=$('#ddTags'); tg.innerHTML='';
-  s.tags.forEach(function(x){ var sp=document.createElement('span'); sp.textContent=x; tg.appendChild(sp); });
+  s.tags.forEach(function(x){ var sp=document.createElement('span'); sp.textContent=tr(x); tg.appendChild(sp); });
+}
+function paintSegLabels(){
+  SEG.forEach(function(s,i){
+    if(segLabels[i]) segLabels[i].textContent=tr(s.n);
+    chipEls[i].textContent=tr(s.n)+' · '+s.t;
+  });
+  pickSeg(curSeg);
 }
 SEG.forEach(function(s,i){
   var b=document.createElement('button');
   b.type='button'; b.className='seg'; b.tabIndex=-1; b.style.flex=s.w+' 1 0';
-  if(s.w>=5){ var sp=document.createElement('span'); sp.textContent=s.n; b.appendChild(sp); }
+  if(s.w>=5){ var sp=document.createElement('span'); sp.textContent=s.n; b.appendChild(sp); segLabels[i]=sp; }
   b.addEventListener('click',function(){ pickSeg(i); });
   track.appendChild(b); segEls.push(b);
   var c=document.createElement('button');
@@ -874,11 +1200,19 @@ SEG.forEach(function(s,i){
   dchips.appendChild(c); chipEls.push(c);
 });
 pickSeg(0);
+langHooks.push(paintSegLabels);
 
 /* ---------- Расходники ---------- */
 var expenseState={accounts:20,videos:2400};
 var expenseFormat=new Intl.NumberFormat('ru-RU',{maximumFractionDigits:2});
 var expensePlural=new Intl.PluralRules('ru-RU');
+var expenseSyncs=[];
+langHooks.push(function(){
+  var loc=LANG==='en'?'en-US':'ru-RU';
+  expenseFormat=new Intl.NumberFormat(loc,{maximumFractionDigits:2});
+  expensePlural=new Intl.PluralRules(loc);
+  expenseSyncs.forEach(function(fn){ fn(); });
+});
 function expenseMoney(cents){ return '$'+expenseFormat.format(cents/100); }
 function paintExpenses(){
   // Account and phone purchases occur once; proxies and video production recur monthly.
@@ -894,7 +1228,7 @@ function connectExpenseInput(key,id,forms){
     expenseState[key]=value;
     range.value=String(value);
     number.value=String(value);
-    range.setAttribute('aria-valuetext',expenseFormat.format(value)+' '+forms[expensePlural.select(value)]);
+    range.setAttribute('aria-valuetext',expenseFormat.format(value)+' '+forms[LANG][expensePlural.select(value)]);
     number.removeAttribute('aria-invalid');
     error.hidden=true;
     error.textContent='';
@@ -905,7 +1239,7 @@ function connectExpenseInput(key,id,forms){
     var value=number.valueAsNumber;
     if(Number.isInteger(value) && value>=min && value<=max){ sync(value); return; }
     number.setAttribute('aria-invalid','true');
-    error.textContent='Введите целое число от '+expenseFormat.format(min)+' до '+expenseFormat.format(max)+'.';
+    error.textContent=LANG==='en'?'Enter a whole number from '+expenseFormat.format(min)+' to '+expenseFormat.format(max)+'.':'Введите целое число от '+expenseFormat.format(min)+' до '+expenseFormat.format(max)+'.';
     error.hidden=false;
   });
   number.addEventListener('blur',function(){
@@ -913,9 +1247,10 @@ function connectExpenseInput(key,id,forms){
     sync(Number.isFinite(value)?Math.min(max,Math.max(min,Math.round(value))):expenseState[key]);
   });
   sync(expenseState[key]);
+  expenseSyncs.push(function(){ sync(expenseState[key]); });
 }
-connectExpenseInput('accounts','expenseAccounts',{one:'аккаунт',few:'аккаунта',many:'аккаунтов',other:'аккаунта'});
-connectExpenseInput('videos','expenseVideos',{one:'видео в месяц',few:'видео в месяц',many:'видео в месяц',other:'видео в месяц'});
+connectExpenseInput('accounts','expenseAccounts',{ru:{one:'аккаунт',few:'аккаунта',many:'аккаунтов',other:'аккаунта'},en:{one:'account',other:'accounts'}});
+connectExpenseInput('videos','expenseVideos',{ru:{one:'видео в месяц',few:'видео в месяц',many:'видео в месяц',other:'видео в месяц'},en:{one:'video per month',other:'videos per month'}});
 
 /* ---------- Заявка ---------- */
 function normTg(value){
@@ -944,17 +1279,17 @@ form.addEventListener('submit',async function(e){
   if(sending) return;
   var name=$('#fName').value.trim(), phone=$('#fPhone').value.trim(), rawTg=$('#fTg').value.trim(), tg=normTg(rawTg);
   var digits=phone.replace(/\D/g,'');
-  if(!name){ showError('Укажите имя.',$('#fName')); return; }
-  if(!phone && !rawTg){ showError('Укажите телефон или Telegram, чтобы мы связались с вами.',$('#fPhone')); return; }
+  if(!name){ showError(tr('Укажите имя.'),$('#fName')); return; }
+  if(!phone && !rawTg){ showError(tr('Укажите телефон или Telegram, чтобы мы связались с вами.'),$('#fPhone')); return; }
   if(phone && (!/^\+?[0-9\s().-]+$/.test(phone) || digits.length<10 || digits.length>15)){
-    showError('Проверьте номер телефона: нужно от 10 до 15 цифр, например +7 900 000-00-00.',$('#fPhone')); return;
+    showError(tr('Проверьте номер телефона: нужно от 10 до 15 цифр, например +7 900 000-00-00.'),$('#fPhone')); return;
   }
   if(rawTg && !/^[A-Za-z][A-Za-z0-9_]{4,31}$/.test(tg)){
-    showError('Проверьте Telegram: имя пользователя начинается с латинской буквы и содержит 5–32 буквы, цифры или подчёркивания.',$('#fTg')); return;
+    showError(tr('Проверьте Telegram: имя пользователя начинается с латинской буквы и содержит 5–32 буквы, цифры или подчёркивания.'),$('#fTg')); return;
   }
   showError('');
   if(!CONFIG.leadEndpoint){
-    showError('Отправка заявок пока недоступна. Попробуйте позже.');
+    showError(tr('Отправка заявок пока недоступна. Попробуйте позже.'));
     return;
   }
   var endpoint;
@@ -962,14 +1297,14 @@ form.addEventListener('submit',async function(e){
     endpoint=new URL(CONFIG.leadEndpoint,location.href);
     if(endpoint.protocol!=='https:' || endpoint.username || endpoint.password) throw new Error('Invalid endpoint');
   }catch(e){
-    showError('Отправка заявок пока недоступна. Попробуйте позже.');
+    showError(tr('Отправка заявок пока недоступна. Попробуйте позже.'));
     return;
   }
   var lead={name:name,phone:phone,telegram:tg?'@'+tg:'',business:$('#fBiz').value.trim(),accounts:$('#fAcc').value};
   sending=true;
   submitButton.disabled=true;
   form.querySelectorAll('input,select').forEach(function(input){ input.disabled=true; });
-  submitButton.textContent='Отправляем…';
+  submitButton.textContent=tr('Отправляем…');
   form.setAttribute('aria-busy','true');
   var controller=new AbortController(), timeout=setTimeout(function(){ controller.abort(); },15000);
   try{
@@ -983,21 +1318,21 @@ form.addEventListener('submit',async function(e){
     var receipt=await response.json();
     if(!receipt || receipt.ok!==true) throw new Error('Missing acceptance receipt');
     if(tg) $('#fTg').value='@'+tg;
-    var how=[];
-    if(tg) how.push('в Telegram @'+tg);
-    if(phone) how.push('по номеру '+phone);
-    $('#doneText').textContent='Свяжемся с вами '+how.join(' или ')+', чтобы выдать тестовый доступ.';
+    var how=[], en=LANG==='en';
+    if(tg) how.push((en?'on Telegram @':'в Telegram @')+tg);
+    if(phone) how.push((en?'at ':'по номеру ')+phone);
+    $('#doneText').textContent=en?'We will contact you '+how.join(' or ')+' to give you test access.':'Свяжемся с вами '+how.join(' или ')+', чтобы выдать тестовый доступ.';
     $('#fBody').hidden=true;
     $('#fDone').hidden=false;
     $('#fEdit').focus();
   }catch(e){
-    showError('Не удалось отправить заявку. Данные сохранены в форме. Попробуйте ещё раз.');
+    showError(tr('Не удалось отправить заявку. Данные сохранены в форме. Попробуйте ещё раз.'));
   }finally{
     clearTimeout(timeout);
     sending=false;
     submitButton.disabled=false;
     form.querySelectorAll('input,select').forEach(function(input){ input.disabled=false; });
-    submitButton.textContent='Получить тестовый доступ';
+    submitButton.textContent=tr('Получить тестовый доступ');
     form.removeAttribute('aria-busy');
   }
 });
@@ -1012,6 +1347,11 @@ var mbar=$('#mbar');
 if('IntersectionObserver' in window){
   new IntersectionObserver(function(es){ es.forEach(function(e){ mbar.classList.toggle('off', e.isIntersecting); }); },{threshold:.15}).observe($('#book'));
 }
+
+/* ---------- Старт языка ---------- */
+langHooks.push(function(){ showError(''); });
+LANG=initialLang();
+applyLang();
 })();
 </script>
 
