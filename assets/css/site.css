@@ -216,7 +216,7 @@ h1 em,h2 em{font-style:normal;color:var(--fg-3)}
 .pay-when{margin-top:14px;max-width:44em;color:var(--fg-2)}
 .plans-refund{margin-top:10px;color:var(--lime);font-size:clamp(18px,1.5vw,21px);line-height:1.35}
 .hero-offer{color:var(--fg)}
-.fit{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-top:clamp(28px,3vw,44px)}
+.fit{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:clamp(28px,3vw,44px)}
 .fit h3{font-size:20px;margin-bottom:8px}
 #results .lead{margin-top:16px;max-width:44em}
 .value b{font-weight:500;color:var(--fg)}
