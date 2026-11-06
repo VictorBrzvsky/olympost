@@ -16,6 +16,16 @@
   var refParam = (new URLSearchParams(location.search).get('ref') || '').trim();
   if (!REF && /^[A-Za-z0-9_-]{1,40}$/.test(refParam)) { REF = refParam; store.set('olympost-ref', REF); }
 
+  /* ---------- traffic source: first visit wins, sent with every form ---------- */
+  var SRC = store.get('olympost-src') || '';
+  if (!SRC) {
+    var q = new URLSearchParams(location.search), rh = '';
+    try { rh = document.referrer ? new URL(document.referrer).hostname : ''; } catch (e) {}
+    if (rh === location.hostname) rh = '';
+    SRC = [q.get('utm_source'), q.get('utm_medium'), q.get('utm_campaign'), rh].filter(Boolean).join(' / ').slice(0, 120);
+    if (SRC) store.set('olympost-src', SRC);
+  }
+
   /* ---------- language ---------- */
   var ruData = JSON.parse($('#i18n-ru').textContent);
   var enData = { t: {}, p: {}, title: document.title };
@@ -58,7 +68,8 @@
   var saved = store.get('olympost-lang');
   var navLang = (navigator.language || 'en').slice(0, 2).toLowerCase();
   $$('[data-lang]').forEach(function (b) { b.addEventListener('click', function () { setLang(b.getAttribute('data-lang'), true); }); });
-  setLang(saved || (/^(ru|uk|be|kk)$/.test(navLang) ? 'ru' : 'en'), false);
+  var langParam = new URLSearchParams(location.search).get('lang');
+  setLang(/^(ru|en)$/.test(langParam || '') ? langParam : saved || (/^(ru|uk|be|kk)$/.test(navLang) ? 'ru' : 'en'), false);
 
   /* ---------- header ---------- */
   var top = $('.top');
@@ -247,9 +258,10 @@
       if (bad.length) { bad[0][0].focus(); return; }
       var btn = $('button[type=submit]', form), msg = $('.form-msg', form);
       btn.disabled = true; if (msg) msg.textContent = '';
-      var body = r.payload; body.lang = LANG; if (REF) body.ref = REF;
-      fetch(ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
-        .then(function (x) { if (!x.ok) throw 0; })
+      var body = r.payload; body.lang = LANG; if (REF) body.ref = REF; if (SRC) body.src = SRC;
+      var ctl = window.AbortController ? new AbortController() : null, tm = ctl ? setTimeout(function () { ctl.abort(); }, 15000) : 0;
+      fetch(ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), signal: ctl ? ctl.signal : undefined })
+        .then(function (x) { clearTimeout(tm); if (!x.ok) throw 0; })
         .then(function () {
           btn.disabled = false; form.reset();
           var d = $('#' + form.id + '-done');
@@ -257,14 +269,14 @@
           $('h3', d).textContent = STR[LANG].thanks;
           form.hidden = true; d.hidden = false; d.setAttribute('tabindex', '-1'); d.focus({ preventScroll: true }); d.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
         })
-        .catch(function () { btn.disabled = false; if (msg) msg.textContent = STR[LANG].fail; });
+        .catch(function () { clearTimeout(tm); btn.disabled = false; if (msg) msg.textContent = STR[LANG].fail; });
     });
   }
   var bk = $('#book-form');
   if (bk) wire(bk, function () {
     var c = $('#bk-contact'), m = $('#bk-email'), pc = parseContact(c.value), em = m.value.trim();
     return { check: [[c, !!pc], [m, isEmail(em)]],
-      payload: { contact: pc || '', email: em, source: 'call', interest: interest || undefined },
+      payload: { contact: pc || '', email: em, source: 'call', interest: interest || undefined, brand: $('#bk-brand').value.trim().slice(0, 120), referred: $('#bk-referred').value.trim().slice(0, 120) },
       done: function () { return STR[LANG].bookDone(pc); } };
   });
   var td = $('#td-form');
