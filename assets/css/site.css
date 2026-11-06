@@ -215,6 +215,16 @@ h1 em,h2 em{font-style:normal;color:var(--fg-3)}
 .founder span{display:block;color:var(--fg-2);font-size:15px;line-height:1.4}
 .pay-when{margin-top:14px;max-width:44em;color:var(--fg-2)}
 .plans-refund{margin-top:10px;color:var(--lime);font-size:clamp(18px,1.5vw,21px);line-height:1.35}
+.hero-offer{color:var(--fg)}
+.fit{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-top:clamp(28px,3vw,44px)}
+.fit h3{font-size:20px;margin-bottom:8px}
+#results .lead{margin-top:16px;max-width:44em}
+.value b{font-weight:500;color:var(--fg)}
+.fit.three{grid-template-columns:repeat(3,1fr)}
+@media (max-width:860px){.fit.three{grid-template-columns:1fr}}
+.value{display:grid;gap:10px;max-width:52em;margin-top:18px}
+@media (max-width:860px){.fit{grid-template-columns:1fr}}
+@media (max-width:980px){.top{background:rgba(14,11,26,.78)}}
 .promise{display:grid;gap:12px;margin-top:8px}
 .promise li{display:flex;gap:14px;color:var(--fg);font-size:clamp(18px,1.5vw,21px);line-height:1.35}
 .promise li::before{content:"";flex:none;width:7px;height:7px;margin-top:.55em;border-radius:50%;background:var(--lime)}
