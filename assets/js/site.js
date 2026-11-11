@@ -34,13 +34,13 @@
   var LANG = 'en';
   var STR = {
     en: { making: 'Making video', pub: 'Publishing', done: 'Published', approve: 'Waiting for your approval', thanks: 'Request received.', fail: 'That did not go through. Please try again.',
-      bookDone: function (c) { return 'We will message you at ' + c + ' within 4 hours to pick a time. On the call: the platform, test access for your 3 free videos, your launch sized for your volume.'; },
+      bookDone: function (c) { return 'We will message you at ' + c + ' within 4 hours to pick a time. On the call: the platform, more videos, your launch sized for your volume.'; },
       tdDone: function (h, m) { return 'The teardown of ' + h + ' goes to ' + m + '.'; },
-      partnerDone: 'We will message you with the next steps.', int: { videos: 'Request: your 3 free videos.', test: 'Request: the Test plan.', network: 'Request: the Network plan.' } },
+      partnerDone: 'We will message you with the next steps.', int: { network: 'Request: the Network plan.' } },
     ru: { making: 'Создаётся видео', pub: 'Публикуется', done: 'Опубликовано', approve: 'Ждёт вашего утверждения', thanks: 'Заявка у нас.', fail: 'Заявка не отправилась. Попробуйте ещё раз.',
-      bookDone: function (c) { return 'Напишем вам на ' + c + ' в течение 4 часов, чтобы выбрать время. На созвоне: платформа, тестовый доступ для ваших 3 бесплатных видео, запуск под ваш объём.'; },
+      bookDone: function (c) { return 'Напишем вам на ' + c + ' в течение 4 часов, чтобы выбрать время. На созвоне: платформа, ещё видео, запуск под ваш объём.'; },
       tdDone: function (h, m) { return 'Разбор ' + h + ' придёт на ' + m + '.'; },
-      partnerDone: 'Напишем и расскажем, что дальше.', int: { videos: 'Запрос: ваши 3 бесплатных видео.', test: 'Запрос: тариф Test.', network: 'Запрос: тариф Network.' } }
+      partnerDone: 'Напишем и расскажем, что дальше.', int: { network: 'Запрос: тариф Network.' } }
   };
   function setLang(lang, remember) {
     lang = lang === 'ru' ? 'ru' : 'en';
