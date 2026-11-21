@@ -264,6 +264,7 @@
         .then(function (x) { clearTimeout(tm); if (!x.ok) throw 0; })
         .then(function () {
           btn.disabled = false; form.reset();
+          if (window.gtag) gtag('event', 'generate_lead', { form_id: form.id });
           var d = $('#' + form.id + '-done');
           $('p', d).textContent = r.done();
           $('h3', d).textContent = STR[LANG].thanks;
