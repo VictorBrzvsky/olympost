@@ -34,13 +34,13 @@
   var LANG = 'en';
   var STR = {
     en: { making: 'Making video', pub: 'Publishing', done: 'Published', approve: 'Waiting for your approval', thanks: 'Request received.', fail: 'That did not go through. Please try again.',
-      bookDone: function (c) { return 'We will message you at ' + c + ' within 4 hours to pick a time. On the call: the platform, more videos, your launch sized for your volume.'; },
+      bookDone: function (c) { return 'We will message you at ' + c + ' within 4 hours to pick a time. On the call: the platform, more videos, your launch sized for your volume. After it, 3 videos for your brand.'; },
       tdDone: function (h, m) { return 'The teardown of ' + h + ' goes to ' + m + '.'; },
-      partnerDone: 'We will message you with the next steps.', int: { network: 'Request: the Network plan.' } },
+      partnerDone: 'We will message you with the next steps.', int: { network: 'Request: white-label.' } },
     ru: { making: 'Создаётся видео', pub: 'Публикуется', done: 'Опубликовано', approve: 'Ждёт вашего утверждения', thanks: 'Заявка у нас.', fail: 'Заявка не отправилась. Попробуйте ещё раз.',
-      bookDone: function (c) { return 'Напишем вам на ' + c + ' в течение 4 часов, чтобы выбрать время. На созвоне: платформа, ещё видео, запуск под ваш объём.'; },
+      bookDone: function (c) { return 'Напишем вам на ' + c + ' в течение 4 часов, чтобы выбрать время. На созвоне: платформа, ещё видео, запуск под ваш объём. После него 3 видео под ваш бренд.'; },
       tdDone: function (h, m) { return 'Разбор ' + h + ' придёт на ' + m + '.'; },
-      partnerDone: 'Напишем и расскажем, что дальше.', int: { network: 'Запрос: тариф Network.' } }
+      partnerDone: 'Напишем и расскажем, что дальше.', int: { network: 'Запрос: white-label.' } }
   };
   function setLang(lang, remember) {
     lang = lang === 'ru' ? 'ru' : 'en';
@@ -93,7 +93,7 @@
 
   /* ---------- count up ---------- */
   var cnt = $$('[data-count]');
-  if (!reduce && 'IntersectionObserver' in window) {
+  if (false) {
     var cio = new IntersectionObserver(function (es) {
       es.forEach(function (x) {
         if (!x.isIntersecting) return;
