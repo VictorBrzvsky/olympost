@@ -349,3 +349,19 @@ form .btn{width:100%}
 @media (max-width:1180px){.tiers{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:860px){.fit.four{grid-template-columns:1fr}}
 @media (max-width:640px){.tiers{grid-template-columns:1fr}}
+
+/* audit fixes */
+.tier .tier-btn{margin-top:4px;align-self:stretch;text-align:center}
+.calc-more{margin-top:18px;max-width:52em}
+.calc-more>summary{cursor:pointer;color:var(--fg);font-weight:500;list-style:none;display:inline-flex;gap:8px;align-items:center}
+.calc-more>summary::-webkit-details-marker{display:none}
+.calc-more>summary::after{content:"+";color:var(--lime)}
+.calc-more[open]>summary::after{content:"−"}
+.calc-more .value{margin-top:12px}
+.start-note{margin-top:22px}
+.direct{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;margin-top:18px;color:var(--fg-2);font-size:15px}
+.direct a{color:var(--fg);text-decoration:underline;text-underline-offset:3px}
+.direct a:hover{color:var(--lime)}
+.wl{margin:14px 0;padding-left:20px;display:grid;gap:10px;color:var(--fg-2)}
+.wl b{color:var(--fg)}
+.clients td:first-child{font-size:clamp(16px,1.6vw,22px)}
